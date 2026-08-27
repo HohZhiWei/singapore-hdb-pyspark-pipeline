@@ -28,3 +28,27 @@ def test_transform_hdb_data():
     assert result.flat_age == 38
     assert result.remaining_lease_years == 61
     assert result.remaining_lease_months == 4
+
+    
+
+def test_remaining_lease_without_months():
+    spark = SparkSession.getActiveSession()
+
+    input_data = [
+        ("2017-01", 275000.0, 68.0, 1981, "63 years")
+    ]
+
+    columns = [
+        "month",
+        "resale_price",
+        "floor_area_sqm",
+        "lease_commence_date",
+        "remaining_lease"
+    ]
+
+    df = spark.createDataFrame(input_data, columns)
+
+    result = transform_hdb_data(df).collect()[0]
+
+    assert result.remaining_lease_years == 63
+    assert result.remaining_lease_months == 0
